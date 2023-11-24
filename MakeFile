@@ -1,0 +1,26 @@
+dockerpsql:
+	docker run --name postgres14docker -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root123 -d postgres:latest 
+
+startdocpsql:
+	docker start postgres14docker
+
+stopdocpsql:
+	docker stop postgres14docker
+
+createdb:
+	docker exec -it postgres14docker createdb --username=root --owner=root simple_shop
+
+dropdb:
+	docker exec -it postgres14docker dropdb simple_shop
+
+migrateup:
+	migrate -path db/migrations -database "postgresql://root:root123@localhost:5432/simple_shop?sslmode=disable" -verbose up
+
+migratedown:
+	migrate -path db/migrations -database "postgresql://root:root123@localhost:5432/simple_shop?sslmode=disable" -verbose down
+
+sqlc: # Change the directory path to your project absolute path 
+	docker run --rm -v C:\Users\Asus\go\src\go-api-project:/db -w /db kjconroy/sqlc generate
+
+.PHONY:
+	dockerpsql startdocpsql stopdocpsql createdb dropdb migrateup migratedown sqlc
